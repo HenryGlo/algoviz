@@ -1,0 +1,22 @@
+{
+  "id": "mean-squared-error",
+  "category": "machine-learning",
+  "kind": "primitive",
+  "subtype": "loss",
+  "title": "Mean squared error",
+  "tagline": "Average of squared residuals — the default regression loss.",
+  "history": "Squared error underpins least squares (Legendre 1805, Gauss ~1809); it is the loss whose minimum the normal equations solve in closed form.",
+  "useCases": [
+    "Regression targets",
+    "A smooth, differentiable training signal",
+    "Penalizing big misses more than small ones",
+    "Reporting model error in the same units²"
+  ],
+  "whenToUse": "Continuous targets where large errors should be punished disproportionately.",
+  "whenNotToUse": "Classification (use cross-entropy) or data with heavy outliers (consider MAE / Huber).",
+  "complexity": "O(n) · gradient w.r.t. prediction is 2·(ŷ − y)",
+  "code": {
+    "python": "import numpy as np\n\ndef mse(y_hat, y):\n    return np.mean((y_hat - y) ** 2)\n\ndef mse_grad(y_hat, y):\n    return 2 * (y_hat - y) / len(y)",
+    "ruby": "def mse(y_hat, y)\n  y_hat.zip(y).sum { |p, t| (p - t) ** 2 } / y.size.to_f\nend\n\ndef mse_grad(y_hat, y)\n  y_hat.zip(y).map { |p, t| 2 * (p - t) / y.size.to_f }\nend"
+  }
+}

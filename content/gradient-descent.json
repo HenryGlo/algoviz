@@ -1,0 +1,25 @@
+{
+  "id": "gradient-descent",
+  "category": "machine-learning",
+  "kind": "primitive",
+  "title": "Gradient descent",
+  "subtype": "optimization",
+  "level": "Intermediate",
+  "viz": "lossCurve",
+  "tagline": "Step downhill on the loss surface, one lr-sized step at a time.",
+  "history": "Introduced by Cauchy in 1847; the workhorse behind training most modern ML models.",
+  "useCases": [
+    "Training models with no closed form",
+    "Logistic regression, neural nets",
+    "Any differentiable loss",
+    "When the dataset is too big to invert matrices"
+  ],
+  "whenToUse": "A differentiable objective, especially at scale where closed-form is too costly.",
+  "whenNotToUse": "When a cheap closed form exists, or the objective isn't differentiable.",
+  "complexity": "O(n·d) per step · make or break: the learning rate",
+  "note": "<b>The learning rate is everything.</b> At lr = 0.5 it drops to the minimum in one step; past 1.0 it diverges.",
+  "code": {
+    "python": "def gradient_descent(grad, w, lr=0.1, steps=1000, tol=1e-8):\n    for _ in range(steps):\n        step = lr * grad(w)\n        w -= step\n        if abs(step) < tol:\n            break\n    return w",
+    "ruby": "def gradient_descent(w, lr: 0.1, steps: 1000, tol: 1e-8)\n  steps.times do\n    step = lr * grad(w)\n    w -= step\n    break if step.abs < tol\n  end\n  w\nend"
+  }
+}

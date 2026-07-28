@@ -1,4 +1,10 @@
 module ApplicationHelper
+  GITHUB_URL = "https://github.com/HenryGlo/algoviz".freeze
+
+  def github_url(path = "")
+    path.present? ? "#{GITHUB_URL}/#{path}" : GITHUB_URL
+  end
+
   # Prosa de la entrada (Markdown -> HTML) con commonmarker.
   def markdown(text)
     return "" if text.blank?

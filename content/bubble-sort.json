@@ -1,0 +1,35 @@
+{
+  "id": "bubble-sort",
+  "category": "sorting",
+  "kind": "algorithm",
+  "title": "Bubble sort",
+  "subtype": "comparison",
+  "level": "Básico",
+  "viz": "bars",
+  "tagline": "Compare neighbors, swap if out of order; big values bubble to the end each pass.",
+  "history": "Analyzed as early as 1956; the name spread in the 1960s. Today it's mostly a teaching algorithm.",
+  "useCases": [
+    "Teaching how sorting works",
+    "Tiny or nearly-sorted arrays",
+    "Cheaply detecting \"is this already sorted?\" with an early-exit flag"
+  ],
+  "whenToUse": "Almost never in production — only tiny n, or nearly-sorted data with the swapped-flag trick.",
+  "whenNotToUse": "Any real dataset. Use your language's built-in sort (Timsort / introsort).",
+  "complexity": "O(n²) time · O(1) space · stable · best case O(n) with early exit",
+  "legend": [
+    [
+      "comparing",
+      "#f5b544"
+    ],
+    [
+      "sorted",
+      "#56d4a0"
+    ]
+  ],
+  "note": "<b>O(n²), but honest.</b> Every bar you see came from the real array, not a hand-drawn animation.",
+  "code": {
+    "python": "def bubble_sort(a):\n    a = a[:]\n    for i in range(len(a) - 1):\n        swapped = False\n        for j in range(len(a) - 1 - i):\n            if a[j] > a[j + 1]:\n                a[j], a[j + 1] = a[j + 1], a[j]\n                swapped = True\n        if not swapped:\n            break\n    return a",
+    "ruby": "def bubble_sort(a)\n  a = a.dup\n  (a.size - 1).times do |i|\n    swapped = false\n    (a.size - 1 - i).times do |j|\n      if a[j] > a[j + 1]\n        a[j], a[j + 1] = a[j + 1], a[j]\n        swapped = true\n      end\n    end\n    break unless swapped\n  end\n  a\nend",
+    "javascript": "function bubbleSort(input) {\n  const a = input.slice();\n  for (let i = 0; i < a.length - 1; i++) {\n    let swapped = false;\n    for (let j = 0; j < a.length - 1 - i; j++) {\n      if (a[j] > a[j + 1]) {\n        [a[j], a[j + 1]] = [a[j + 1], a[j]];\n        swapped = true;\n      }\n    }\n    if (!swapped) break;\n  }\n  return a;\n}"
+  }
+}

@@ -1,6 +1,0 @@
-<%= link_to category_path(category), class: "card card--category", style: "--accent: #{category.color}" do %>
-  <span class="card__dot"></span>
-  <h3 class="card__title"><%= category.name %></h3>
-  <p class="card__desc"><%= category.description %></p>
-  <span class="card__meta"><%= pluralize(category.entries.size, "entrada") %></span>
-<% end %>

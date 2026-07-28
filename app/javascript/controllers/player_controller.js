@@ -1,77 +1,56 @@
 import { Controller } from "@hotwired/stimulus"
 import * as renderers from "renderers"
 
-// Un solo Player para todas las visualizaciones. No sabe nada del algoritmo:
-// recibe un trace (array de pasos) por data attribute y delega el dibujo de
-// cada paso a un renderer elegido por su id (`renderer` value == entry.viz).
+// El "VCR de Stimulus": maneja el tiempo, no sabe nada del algoritmo.
+// Lee un trace (array de pasos) de un data attribute y lo reproduce.
 export default class extends Controller {
+  static targets = ["canvas", "scrub", "status", "readout", "play"]
   static values = {
-    trace: Array,
+    trace:    Array,
+    points:   { type: Array,  default: [] }, // dataset estático para scatter
     renderer: String,
-    speed: { type: Number, default: 420 }
+    speed:    { type: Number, default: 1 }
   }
-  static targets = ["canvas", "playLabel", "progress"]
 
   connect() {
-    this.i = -1
     this.render = renderers[this.rendererValue]
+    this.i = 0
+    this.scrubTarget.max = this.traceValue.length - 1
     this.draw()
   }
-
   disconnect() { this.pause() }
 
-  toggle() { this.timer ? this.pause() : this.play() }
-
-  play() {
-    if (this.atEnd) this.i = -1               // re-arrancar si terminó
-    this.timer = setInterval(() => this.step(), this.speedValue)
-    this.setPlaying(true)
-  }
-
-  pause() {
-    clearInterval(this.timer)
-    this.timer = null
-    this.setPlaying(false)
-  }
-
-  step() {
-    if (this.i < this.traceValue.length - 1) {
-      this.i++
-      this.draw()
-    } else {
-      this.pause()
-    }
-  }
-
-  reset() {
-    this.pause()
-    this.i = -1
-    this.draw()
-  }
-
-  // <input type="range"> -> delay en ms (más a la derecha = más rápido).
-  setSpeed(event) {
-    const pct = Number(event.target.value)           // 0..100
-    this.speedValue = Math.round(60 + (100 - pct) * 9) // ~960ms .. 60ms
-    if (this.timer) { this.pause(); this.play() }
-  }
-
   draw() {
-    const step = this.i < 0 ? null : this.traceValue[this.i]
-    if (this.render) this.render(this.canvasTarget, step)
-    this.updateProgress()
+    this.render(
+      { svg: this.canvasTarget, points: this.pointsValue, readout: (r) => this.#readout(r) },
+      this.traceValue[this.i]
+    )
+    this.scrubTarget.value = this.i
+    this.statusTarget.textContent = `${this.i} / ${this.traceValue.length - 1}`
   }
 
-  get atEnd() { return this.i >= this.traceValue.length - 1 }
-
-  setPlaying(on) {
-    if (this.hasPlayLabelTarget) this.playLabelTarget.textContent = on ? "Pausa" : "Play"
+  toggle() { this.timer ? this.pause() : this.play() }
+  play() {
+    if (this.timer) return
+    if (this.i >= this.traceValue.length - 1) this.i = 0
+    this.playTarget.classList.add("is-playing")
+    this.timer = setInterval(() => {
+      if (this.i >= this.traceValue.length - 1) return this.pause()
+      this.i++; this.draw()
+    }, 640 / this.speedValue)
   }
+  pause() {
+    clearInterval(this.timer); this.timer = null
+    this.playTarget.classList.remove("is-playing")
+  }
+  step()  { this.pause(); if (this.i < this.traceValue.length - 1) { this.i++; this.draw() } }
+  reset() { this.pause(); this.i = 0; this.draw() }
+  seek(e) { this.pause(); this.i = +e.target.value; this.draw() }
+  setSpeed(e) { this.speedValue = +e.target.value; if (this.timer) { this.pause(); this.play() } }
 
-  updateProgress() {
-    if (!this.hasProgressTarget) return
-    const total = this.traceValue.length
-    const shown = this.i < 0 ? 0 : this.i + 1
-    this.progressTarget.textContent = `${shown} / ${total}`
+  #readout(rows) {
+    this.readoutTarget.innerHTML = rows
+      .map(([k, v]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`)
+      .join("")
   }
 }

@@ -1,0 +1,29 @@
+{
+  "id": "my-algorithm-slug",
+  "category": "machine-learning",
+  "kind": "algorithm",
+  "subtype": "optimization",
+  "level": "Básico",
+  "viz": "lossCurve",
+  "title": "My algorithm",
+  "tagline": "One-sentence intuition, plain language.",
+  "history": "Who devised it and roughly when — one or two sentences.",
+  "useCases": [
+    "Where it shines",
+    "Another realistic use"
+  ],
+  "whenToUse": "The condition under which this is the right tool.",
+  "whenNotToUse": "When to reach for something else instead.",
+  "complexity": "O(...) time · O(...) space · any caveats",
+  "legend": [
+    [
+      "label",
+      "#b98bff"
+    ]
+  ],
+  "note": "Optional call-out. Can contain <b>bold</b>.",
+  "code": {
+    "python": "def my_algorithm(...):\n    ...",
+    "ruby": "def my_algorithm(...)\n  ...\nend"
+  }
+}

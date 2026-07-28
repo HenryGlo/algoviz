@@ -1,54 +1,20 @@
-import { svgEl, clear, placeholder } from "renderers/svg"
-
-// Renderer de sorting: dibuja el array como barras y resalta comparaciones,
-// swaps y la cola ya ordenada según el paso del trace.
-const W = 460, H = 260
-const PAD_X = 18, TOP = 26, BASE = 232, GAP = 6
-
-export function draw(canvas, step) {
-  if (!step) return placeholder(canvas, "Presioná Play para ordenar")
-
-  clear(canvas)
-  const a = step.array
-  const n = a.length
-  const max = Math.max(...a, 1)
-  const bandW = (W - PAD_X * 2) / n
-  const barW = bandW - GAP
-  const usableH = BASE - TOP
-
-  a.forEach((value, idx) => {
-    const h = Math.max(4, (value / max) * usableH)
-    const x = PAD_X + idx * bandW + GAP / 2
-    const y = BASE - h
-
-    canvas.appendChild(svgEl("rect", {
-      x, y, width: barW, height: h, rx: 4,
-      class: `bar ${barClass(step, idx, n)}`
-    }))
-    canvas.appendChild(svgEl("text", {
-      x: x + barW / 2, y: BASE + 16, "text-anchor": "middle", class: "bar-label"
-    }, value))
+import { CL, el } from "renderers/_svg"
+// bubble sort: barras, par comparado resaltado, cola ordenada en verde
+export function bars(ctx, step) {
+  const svg = ctx.svg
+  svg.setAttribute("viewBox", "0 0 460 220"); svg.innerHTML = ""
+  const arr = step ? step.array : []
+  const bw = 44, gap = 14, x0 = (460 - (arr.length * bw + (arr.length - 1) * gap)) / 2
+  arr.forEach((v, n) => {
+    let col = "#85b7eb"
+    if (step) {
+      if (n >= step.sorted || step.type === "done") col = CL[1]
+      if (n === step.i || n === step.k) col = CL[2]
+    }
+    const bh = v * 20 + 10, x = x0 + n * (bw + gap), y = 200 - bh
+    svg.appendChild(el("rect", { x, y, width: bw, height: bh, rx: 6, fill: col }))
+    const t = el("text", { x: x + bw / 2, y: y - 6, "text-anchor": "middle", "font-size": 13, fill: "#f3f2f2" })
+    t.textContent = v; svg.appendChild(t)
   })
-
-  canvas.appendChild(svgEl("text", {
-    x: PAD_X, y: 18, class: "viz-caption"
-  }, caption(step)))
-}
-
-function barClass(step, idx, n) {
-  const sorted = step.sorted ?? n
-  if (step.type === "done" || idx >= sorted) return "bar--sorted"
-  if (idx === step.i || idx === step.k) {
-    return step.type === "swap" ? "bar--swap" : "bar--compare"
-  }
-  return ""
-}
-
-function caption(step) {
-  switch (step.type) {
-    case "compare": return `Comparo ${step.i} y ${step.k}`
-    case "swap":    return `Intercambio ${step.i} y ${step.k}`
-    case "done":    return "Ordenado ✓"
-    default:        return ""
-  }
+  if (step) ctx.readout([["paso", step.type], ["comparaciones", step.cmp]])
 }

@@ -1,0 +1,22 @@
+{
+  "id": "sigmoid",
+  "category": "machine-learning",
+  "kind": "primitive",
+  "subtype": "activation",
+  "title": "Sigmoid function",
+  "tagline": "Squashes any real number into (0, 1) — a smooth on/off switch.",
+  "history": "The logistic function goes back to Verhulst (1838); it became the classic activation that let neural networks learn non-linear functions.",
+  "useCases": [
+    "Output layer for binary probabilities",
+    "Activation in small/older networks",
+    "Gating in LSTMs and attention",
+    "Turning a score into a 0–1 confidence"
+  ],
+  "whenToUse": "When you need a bounded (0, 1) output — a probability or a soft gate.",
+  "whenNotToUse": "Deep hidden layers: gradients vanish. Prefer ReLU/GELU there, and softmax for multi-class output.",
+  "complexity": "O(1) per element · derivative is σ(z)·(1 − σ(z))",
+  "code": {
+    "python": "import numpy as np\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))\n\ndef sigmoid_deriv(a):\n    # a = sigmoid(z), already activated\n    return a * (1 - a)",
+    "ruby": "def sigmoid(z)\n  1.0 / (1 + Math.exp(-z))\nend\n\ndef sigmoid_deriv(a)\n  a * (1 - a) # a = sigmoid(z), already activated\nend"
+  }
+}

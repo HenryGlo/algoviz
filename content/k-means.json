@@ -1,0 +1,40 @@
+{
+  "id": "k-means",
+  "category": "machine-learning",
+  "kind": "algorithm",
+  "title": "k-means clustering",
+  "subtype": "clustering",
+  "level": "Básico",
+  "viz": "kmeans",
+  "tagline": "Drop k flags on a map; everyone joins their nearest flag; each flag walks to the middle of its crowd; repeat.",
+  "history": "Lloyd's algorithm, devised at Bell Labs in 1957 (published 1982); the name \"k-means\" comes from MacQueen in 1967.",
+  "useCases": [
+    "Customer / user segmentation",
+    "Color quantization in images",
+    "Clustering embeddings or documents",
+    "A fast baseline before fancier clustering"
+  ],
+  "whenToUse": "Roughly spherical, similar-size clusters, numeric scaled features, and a k you can pick.",
+  "whenNotToUse": "Non-convex shapes, very different densities, unknown k, or categorical data — reach for DBSCAN, GMM, or hierarchical.",
+  "complexity": "O(n · k · i) time · converges to a local optimum (seed matters)",
+  "legend": [
+    [
+      "cluster A",
+      "#b98bff"
+    ],
+    [
+      "cluster B",
+      "#56d4a0"
+    ],
+    [
+      "cluster C",
+      "#f5b544"
+    ]
+  ],
+  "note": "<b>It stops at a minimum, not the minimum.</b> Seed badly and you get a bad answer, confidently. Press reset a few times and watch it happen.",
+  "code": {
+    "python": "import numpy as np\n\ndef kmeans(X, k, iters=100):\n    C = X[np.random.choice(len(X), k, replace=False)]\n    for _ in range(iters):\n        labels = np.argmin(((X[:, None] - C) ** 2).sum(2), axis=1)\n        new_C = np.array([X[labels == j].mean(0) for j in range(k)])\n        if np.allclose(new_C, C):\n            break\n        C = new_C\n    return labels, C",
+    "ruby": "def kmeans(points, k, iters: 100)\n  centroids = points.sample(k)\n  labels = nil\n  iters.times do\n    labels = points.map { |p| (0...k).min_by { |i| dist2(p, centroids[i]) } }\n    new_c = (0...k).map do |i|\n      cluster = points.select.with_index { |_, j| labels[j] == i }\n      cluster.empty? ? centroids[i] : mean(cluster)\n    end\n    break if new_c == centroids\n    centroids = new_c\n  end\n  [labels, centroids]\nend",
+    "javascript": "function kmeans(points, k, iters = 100) {\n  let C = points.slice().sort(() => Math.random() - 0.5).slice(0, k);\n  let labels;\n  for (let t = 0; t < iters; t++) {\n    labels = points.map(p =>\n      C.reduce((b, c, i) => {\n        const d = (p[0]-c[0])**2 + (p[1]-c[1])**2;\n        return d < b.d ? { i, d } : b;\n      }, { i: 0, d: Infinity }).i);\n    const nc = C.map((_, i) => {\n      const cl = points.filter((_, j) => labels[j] === i);\n      if (!cl.length) return C[i];\n      return [cl.reduce((s,p)=>s+p[0],0)/cl.length, cl.reduce((s,p)=>s+p[1],0)/cl.length];\n    });\n    if (JSON.stringify(nc) === JSON.stringify(C)) break;\n    C = nc;\n  }\n  return { labels, centroids: C };\n}"
+  }
+}

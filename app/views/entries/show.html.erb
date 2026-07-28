@@ -1,19 +1,82 @@
-<% content_for :title, "#{@entry.title} · algoviz" %>
+<% content_for :title, "#{@entry[:title]} · algoviz" %>
+<div class="wrap">
+  <div class="crumb"><%= link_to "home", root_path %> / <%= link_to @category[:name].downcase, category_path(@entry[:cat]) %> / <%= @slug %></div>
 
-<nav class="breadcrumb">
-  <%= link_to "algoviz", root_path %> <span>/</span>
-  <%= link_to @category.name, category_path(@category) %> <span>/</span>
-  <span aria-current="page"><%= @entry.title %></span>
-</nav>
+  <h1 class="entry"><%= @entry[:title] %>
+    <% if (label = AlgovizCatalog::KIND_LABEL[@entry[:kind]]) && @entry[:kind] != "algorithm" %>
+      <span class="kind-badge"><%= label %></span>
+    <% end %>
+  </h1>
+  <p class="intuition"><%= @entry[:intuition] %></p>
 
-<header class="entry-head" style="--accent: <%= @category.color %>">
-  <div class="entry-head__tags">
-    <span class="tag"><%= @category.name %></span>
-    <% if @entry.subtype.present? %><span class="tag tag--ghost"><%= @entry.subtype %></span><% end %>
-    <%= level_badge(@entry.level) %>
-  </div>
-  <h1 class="entry-head__title"><%= @entry.title %></h1>
-  <p class="entry-head__intuition"><%= @entry.intuition %></p>
-</header>
+  <% if @entry[:uses].present? %>
+    <div class="built-from">Built from
+      <% @entry[:uses].each_with_index do |uid, i| %><%= " · " if i > 0 %><%= link_to AlgovizCatalog.title_of(uid), entry_path(uid) %><% end %>
+    </div>
+  <% end %>
 
-<%= render @entry.animated? ? "entries/animated" : "entries/code_contrast" %>
+  <% if @entry[:viz].present? && @trace.present? %>
+    <article class="viz"
+         data-controller="player"
+         data-player-trace-value="<%= @trace.to_json %>"
+         data-player-points-value="<%= @points.to_json %>"
+         data-player-renderer-value="<%= @entry[:viz] %>">
+      <div class="stage"><svg data-player-target="canvas" class="plot"></svg></div>
+      <% if @entry[:legend] %>
+        <div class="legend">
+          <% @entry[:legend].each do |label, color| %><span><i style="background:<%= color %>"></i><%= label %></span><% end %>
+        </div>
+      <% end %>
+      <div class="controls">
+        <button class="pc play" data-player-target="play" data-action="player#toggle" aria-label="play">▶</button>
+        <button class="pc" data-action="player#step"  aria-label="step">→</button>
+        <button class="pc" data-action="player#reset" aria-label="reset">⟲</button>
+        <input class="scrub" type="range" min="0" data-player-target="scrub" data-action="player#seek">
+        <span class="mono" data-player-target="status" style="font-size:12px;color:var(--muted);min-width:56px;text-align:right">0 / 0</span>
+        <select data-action="player#setSpeed" style="background:var(--panel);color:var(--fg);border:1px solid var(--line2);font-family:var(--mono);font-size:12px;padding:6px">
+          <option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option>
+        </select>
+      </div>
+      <div class="readout" data-player-target="readout"></div>
+    </article>
+  <% end %>
+
+  <% if @entry[:note].present? %><div class="note"><%== @entry[:note] %></div><% end %>
+
+  <% if @entry[:history].present? %>
+    <h2 class="sec" style="padding:26px 0 10px">Historia</h2>
+    <p class="prose"><%= @entry[:history] %></p>
+  <% end %>
+
+  <% if @entry[:use_cases].present? %>
+    <h2 class="sec" style="padding:26px 0 10px">Casos de uso</h2>
+    <ul class="uses">
+      <% @entry[:use_cases].each do |uc| %><li><%= uc %></li><% end %>
+    </ul>
+  <% end %>
+
+  <% if @entry[:when_to_use].present? || @entry[:when_not_to_use].present? %>
+    <div class="whenblk">
+      <% if @entry[:when_to_use].present? %>
+        <div class="when good"><div class="wh">✓ cuándo usarlo</div><p><%= @entry[:when_to_use] %></p></div>
+      <% end %>
+      <% if @entry[:when_not_to_use].present? %>
+        <div class="when bad"><div class="wh">✕ cuándo no</div><p><%= @entry[:when_not_to_use] %></p></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @entry[:code].present? %>
+    <div class="tabs" data-controller="tabs" data-tabs-code-value="<%= @entry[:code].to_json %>">
+      <% @entry[:code].keys.each_with_index do |lang, i| %>
+        <button class="tab <%= 'on' if i.zero? %>" data-action="tabs#pick" data-tabs-lang-param="<%= lang %>"><%= lang %></button>
+      <% end %>
+      <pre style="width:100%;margin-top:10px"><code data-tabs-target="code"><%= @entry[:code].values.first %></code></pre>
+    </div>
+  <% end %>
+
+  <% if @entry[:complexity].present? %>
+    <div class="complexity">⏱ <%= @entry[:complexity] %></div>
+  <% end %>
+</div>
+<div class="wrap"><footer><span>algoviz v0.4</span><%= link_to "← volver a #{@category[:name].downcase}", category_path(@entry[:cat]) %></footer></div>

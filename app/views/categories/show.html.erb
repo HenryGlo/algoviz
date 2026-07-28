@@ -1,38 +1,45 @@
-<% content_for :title, "#{@category.name} · algoviz" %>
+<% content_for :title, "#{@category[:name]} · algoviz" %>
+<div class="wrap" data-controller="filter">
+  <div class="crumb"><%= link_to "home", root_path %> / <%= @category[:name].downcase %></div>
+  <h1 class="entry" style="color:<%= @category[:color] %>"><%= @category[:name] %></h1>
+  <p class="intuition"><%= @category[:desc] %></p>
 
-<nav class="breadcrumb">
-  <%= link_to "algoviz", root_path %> <span>/</span> <span aria-current="page"><%= @category.name %></span>
-</nav>
-
-<header class="page-head" style="--accent: <%= @category.color %>">
-  <span class="page-head__dot"></span>
-  <div>
-    <h1 class="page-head__title"><%= @category.name %></h1>
-    <p class="page-head__lead"><%= @category.description %></p>
-  </div>
-</header>
-
-<%# El filtro por subtipo vive dentro de un Turbo Frame: al tocar un chip,
-    Turbo re-renderiza server-side sólo este frame, sin recargar la página. %>
-<%= turbo_frame_tag "catalog" do %>
-  <% if @category.subtypes.any? %>
+  <% if @subtypes.any? %>
     <div class="chips">
-      <%= link_to "Todos", category_path(@category),
-            class: "chip #{'chip--on' if @subtype.blank?}",
-            data: { turbo_action: "advance" } %>
-      <% @category.subtypes.each do |sub| %>
-        <%= link_to sub, category_path(@category, subtype: sub),
-              class: "chip #{'chip--on' if @subtype == sub}",
-              data: { turbo_action: "advance" } %>
+      <button class="chip on" data-action="filter#pick" data-filter-sub-param="all"
+              style="border-color:<%= @category[:color] %>;background:<%= @category[:color] %>22;color:var(--fg)">todos</button>
+      <% @subtypes.each do |s| %>
+        <button class="chip" data-action="filter#pick" data-filter-sub-param="<%= s %>"><%= s %></button>
       <% end %>
     </div>
   <% end %>
 
-  <% if @entries.any? %>
-    <div class="grid grid--entries">
-      <%= render partial: "entries/entry_card", collection: @entries, as: :entry %>
-    </div>
-  <% else %>
-    <p class="empty">Todavía no hay entradas para este filtro.</p>
-  <% end %>
-<% end %>
+  <div class="grid-entries">
+    <% @entries.each do |slug, e| %>
+      <%= link_to entry_path(slug), class: "entry-card", data: { sub: e[:sub] }, style: "border-color:#{@category[:color]}33" do %>
+        <div class="sub" style="color:<%= @category[:color] %>"><%= e[:sub] || e[:kind] %></div>
+        <h3><%= e[:title] %></h3>
+        <p><%= truncate(e[:intuition], length: 96) %></p>
+        <div class="foot"><span><%= e[:viz] ? "▶ #{e[:viz]}" : "◦ #{e[:kind]}" %></span><span class="lvl"><%= e[:level] || e[:kind] %></span></div>
+      <% end %>
+    <% end %>
+
+    <% @patterns.each do |slug, p| %>
+      <%= link_to pattern_path(slug), class: "entry-card", data: { sub: p[:sub] }, style: "border-color:#{@category[:color]}33" do %>
+        <div class="sub" style="color:<%= @category[:color] %>">⚠ <%= p[:kind] %></div>
+        <h3><%= p[:title] %></h3>
+        <p><%= truncate(p[:symptom], length: 96) %></p>
+        <div class="foot"><span>↔ antes / después</span><span class="lvl">refactor</span></div>
+      <% end %>
+    <% end %>
+
+    <% @soon.each do |name| %>
+      <div class="entry-card soon" data-sub="soon" style="border-style:dashed">
+        <div class="sub" style="color:var(--faint)">próximamente</div>
+        <h3><%= name %></h3><p>Todavía no hay nada acá — y eso es una invitación.</p>
+        <div class="foot"><span>Reclamá este</span><span>+ PR</span></div>
+      </div>
+    <% end %>
+  </div>
+</div>
+<div class="wrap"><footer><span>algoviz v0.4</span><span><%= @entries.size + @patterns.size %> live · <%= @soon.size %> en el roadmap</span></footer></div>

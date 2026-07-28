@@ -1,0 +1,27 @@
+{
+  "id": "mlp",
+  "category": "machine-learning",
+  "kind": "model",
+  "subtype": "neural network",
+  "title": "Multilayer perceptron (MLP)",
+  "tagline": "Stacked sigmoid layers that learn non-linear boundaries — the smallest net that solves XOR.",
+  "history": "The perceptron dates to Rosenblatt (1958); backpropagation through hidden layers was popularized by Rumelhart, Hinton & Williams (1986), reviving neural nets.",
+  "useCases": [
+    "Non-linear classification / regression",
+    "A from-scratch intro to backprop",
+    "Tabular problems too gnarly for a linear model",
+    "Understanding what deep nets do, in miniature"
+  ],
+  "whenToUse": "A non-linear relationship and a modest feature count, when you want a self-contained net you fully understand.",
+  "whenNotToUse": "Images, text, or large data — use CNNs/Transformers and a real framework (PyTorch). Sigmoid-only deep nets also suffer vanishing gradients.",
+  "complexity": "O(epochs · n · Σ layer sizes) · trained by backprop + gradient descent",
+  "uses": [
+    "sigmoid",
+    "mean-squared-error",
+    "gradient-descent"
+  ],
+  "code": {
+    "python": "import numpy as np\n\n# --- primitives (kept as separate, named methods) ---\ndef sigmoid(z):        return 1 / (1 + np.exp(-z))\ndef sigmoid_deriv(a):  return a * (1 - a)          # a already activated\ndef mse(y_hat, y):     return np.mean((y_hat - y) ** 2)\n\n# --- MLP: 1 input layer, 2 hidden, 1 output — all sigmoid ---\ndef init_params(n_in, h1, h2, n_out, seed=0):\n    rng = np.random.default_rng(seed)\n    return [rng.normal(0, 1, (h1, n_in)),  np.zeros(h1),\n            rng.normal(0, 1, (h2, h1)),    np.zeros(h2),\n            rng.normal(0, 1, (n_out, h2)), np.zeros(n_out)]\n\ndef forward(x, p):\n    W1, b1, W2, b2, W3, b3 = p\n    a1 = sigmoid(W1 @ x + b1)\n    a2 = sigmoid(W2 @ a1 + b2)\n    a3 = sigmoid(W3 @ a2 + b3)\n    return a1, a2, a3\n\ndef backward(x, y, cache, p):\n    a1, a2, a3 = cache\n    _, _, W2, _, W3, _ = p\n    d3 = (a3 - y) * sigmoid_deriv(a3)\n    d2 = (W3.T @ d3) * sigmoid_deriv(a2)\n    d1 = (W2.T @ d2) * sigmoid_deriv(a1)\n    return [np.outer(d1, x), d1, np.outer(d2, a1), d2, np.outer(d3, a2), d3]\n\ndef train(X, Y, hidden=(4, 4), lr=0.5, epochs=4000, seed=0):\n    p = init_params(X.shape[1], hidden[0], hidden[1], Y.shape[1], seed)\n    for _ in range(epochs):\n        for x, y in zip(X, Y):                     # stochastic gradient descent\n            grads = backward(x, y, forward(x, p), p)\n            p = [w - lr * g for w, g in zip(p, grads)]\n    return p\n\n# X = [[0,0],[0,1],[1,0],[1,1]]; Y = [[0],[1],[1],[0]]  # learns XOR",
+    "ruby": "require \"matrix\"\n\n# --- primitives (separate, named) ---\nsigmoid  = ->(v) { v.map { |z| 1.0 / (1 + Math.exp(-z)) } }\ndsigmoid = ->(a) { a.map { |x| x * (1 - x) } }            # a already activated\nhadamard = ->(u, w) { Vector.elements(u.each_with_index.map { |x, i| x * w[i] }) }\nouter    = ->(u, w) { Matrix.build(u.size, w.size) { |i, j| u[i] * w[j] } }\n\n# --- MLP: 1 input layer, 2 hidden, 1 output — all sigmoid ---\ndef init_params(n_in, h1, h2, n_out)\n  [Matrix.build(h1, n_in)  { rand - 0.5 }, Vector.zero(h1),\n   Matrix.build(h2, h1)    { rand - 0.5 }, Vector.zero(h2),\n   Matrix.build(n_out, h2) { rand - 0.5 }, Vector.zero(n_out)]\nend\n\ndef forward(x, p, sig)\n  w1, b1, w2, b2, w3, b3 = p\n  a1 = sig[w1 * x + b1]\n  a2 = sig[w2 * a1 + b2]\n  a3 = sig[w3 * a2 + b3]\n  [a1, a2, a3]\nend\n\ndef backward(x, y, cache, p, dsig, had, out)\n  a1, a2, a3 = cache\n  _, _, w2, _, w3, _ = p\n  d3 = had[(a3 - y), dsig[a3]]\n  d2 = had[(w3.transpose * d3), dsig[a2]]\n  d1 = had[(w2.transpose * d2), dsig[a1]]\n  [out[d1, x], d1, out[d2, a1], d2, out[d3, a2], d3]\nend\n\ndef train(xs, ys, lr: 0.5, epochs: 4000)\n  p = init_params(xs.first.size, 4, 4, ys.first.size)\n  epochs.times do\n    xs.zip(ys).each do |x, y|\n      grads = backward(x, y, forward(x, p, SIG), p, DSIG, HAD, OUT)\n      p = p.each_with_index.map { |param, i| param - grads[i] * lr }\n    end\n  end\n  p\nend"
+  }
+}

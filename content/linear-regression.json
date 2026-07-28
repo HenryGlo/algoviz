@@ -1,0 +1,30 @@
+{
+  "id": "linear-regression",
+  "category": "machine-learning",
+  "kind": "model",
+  "title": "Linear regression",
+  "subtype": "regression",
+  "level": "Básico",
+  "viz": "linearReg",
+  "tagline": "Find the line that minimizes squared error between predictions and truth.",
+  "history": "Least squares was published by Legendre (1805) and Gauss (~1809); Galton coined \"regression\" in the 1880s while studying regression to the mean.",
+  "useCases": [
+    "Forecasting a continuous value",
+    "Estimating the effect size of a feature",
+    "A fast, interpretable baseline",
+    "Trend lines in a notebook"
+  ],
+  "whenToUse": "A roughly linear relationship when you want interpretable coefficients.",
+  "whenNotToUse": "Strong non-linearity, heavy multicollinearity (add Ridge/Lasso), or non-constant noise.",
+  "complexity": "Closed form O(n·d² + d³) · gradient descent O(n·d·i)",
+  "note": "<b>Same machinery as gradient descent.</b> Here the descent tunes two parameters — slope and intercept — and you watch the line snap onto the points.",
+  "code": {
+    "python": "import numpy as np\n\ndef linear_regression(X, y):\n    # closed form: w = (XᵀX)⁻¹ Xᵀy, with a bias column\n    Xb = np.c_[np.ones(len(X)), X]\n    return np.linalg.pinv(Xb.T @ Xb) @ Xb.T @ y   # [bias, slope...]",
+    "ruby": "def linear_regression(xs, ys)\n  n  = xs.size.to_f\n  mx = xs.sum / n\n  my = ys.sum / n\n  slope = xs.zip(ys).sum { |x, y| (x - mx) * (y - my) } /\n          xs.sum { |x| (x - mx) ** 2 }\n  [my - slope * mx, slope]   # [intercept, slope]\nend",
+    "javascript": "function linearRegression(xs, ys) {\n  const n = xs.length;\n  const mx = xs.reduce((a, b) => a + b) / n;\n  const my = ys.reduce((a, b) => a + b) / n;\n  const slope =\n    xs.reduce((s, x, i) => s + (x - mx) * (ys[i] - my), 0) /\n    xs.reduce((s, x) => s + (x - mx) ** 2, 0);\n  return { intercept: my - slope * mx, slope };\n}"
+  },
+  "uses": [
+    "mean-squared-error",
+    "gradient-descent"
+  ]
+}

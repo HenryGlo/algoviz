@@ -1,6 +1,8 @@
 class HomeController < ApplicationController
   def index
-    @categories = Category.order(:name)
-    @featured = Entry.animated.ordered.includes(:category).limit(4)
+    @categories = AlgovizCatalog::CATEGORIES
+    hero = AlgovizViz.build("linearReg")
+    @hero_trace = hero[:trace]
+    @hero_points = hero[:points]
   end
 end

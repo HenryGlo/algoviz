@@ -1,0 +1,34 @@
+<% content_for :title, "#{@pattern[:title]} · algoviz" %>
+<div class="wrap">
+  <div class="crumb"><%= link_to "home", root_path %> / <%= link_to @category[:name].downcase, category_path(@pattern[:cat]) %> / <%= @slug %></div>
+  <div class="eyebrow" style="color:<%= @category[:color] %>;margin:34px 0 6px">⚠ rails · <%= @pattern[:kind] %></div>
+  <h1 class="entry"><%= @pattern[:title] %></h1>
+
+  <div class="note" style="border-color:<%= @category[:color] %>;background:<%= @category[:color] %>12">
+    <b>El síntoma.</b> <%= @pattern[:symptom] %>
+  </div>
+
+  <% if @pattern[:history].present? %>
+    <p class="prose"><%= @pattern[:history] %></p>
+  <% end %>
+
+  <% if @pattern[:signals].present? %>
+    <h2 class="sec" style="padding:22px 0 10px">Señales</h2>
+    <ul class="uses">
+      <% @pattern[:signals].each do |s| %><li><%= s %></li><% end %>
+    </ul>
+  <% end %>
+
+  <div class="cc">
+    <div class="card bad"><div class="h">✕ el problema</div><pre><code><%= @pattern[:bad] %></code></pre></div>
+    <div class="card good"><div class="h">✓ el fix</div><pre><code><%= @pattern[:good] %></code></pre></div>
+  </div>
+
+  <% if @pattern[:rule].present? %>
+    <div class="complexity" style="border:0;padding:10px 0 4px"><b style="color:var(--fg)">La regla.</b> <%= @pattern[:rule] %></div>
+  <% end %>
+  <% if @pattern[:caveat].present? %>
+    <div class="complexity"><b style="color:var(--fg)">No te pases.</b> <%= @pattern[:caveat] %></div>
+  <% end %>
+</div>
+<div class="wrap"><footer><span>algoviz v0.4</span><%= link_to "← #{@category[:name].downcase}", category_path(@pattern[:cat]) %></footer></div>

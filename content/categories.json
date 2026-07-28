@@ -1,0 +1,42 @@
+{
+  "categories": [
+    {
+      "id": "machine-learning",
+      "name": "Machine learning",
+      "color": "#b98bff",
+      "desc": "Models that learn by iterating. Watch the loss fall, the centroids settle, the boundary bend.",
+      "count": "8 algorithms"
+    },
+    {
+      "id": "sorting",
+      "name": "Sorting",
+      "color": "#56d4a0",
+      "desc": "Comparisons and swaps, replayed frame by frame from the real array.",
+      "count": "6 algorithms"
+    },
+    {
+      "id": "rails-antipatterns",
+      "name": "Rails · anti-patterns",
+      "color": "#f5b544",
+      "desc": "The smell, why it hurts, and the refactor — side by side.",
+      "count": "5 anti-patterns"
+    }
+  ],
+  "featured": [
+    "linear-regression",
+    "k-means",
+    "bubble-sort"
+  ],
+  "roadmap": {
+    "machine-learning": [
+      "logistic regression",
+      "forward pass",
+      "gradient boosting"
+    ],
+    "sorting": [
+      "quick sort",
+      "merge sort"
+    ],
+    "rails-antipatterns": []
+  }
+}

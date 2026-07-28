@@ -1,11 +1,10 @@
 Rails.application.routes.draw do
   root "home#index"
 
-  # Health check para monitores/uptime (Render lo usa).
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Índice de categoría (con filtro por subtipo vía Turbo Frame) y entrada.
-  # Van al final: son las rutas "catch-all" públicas del portfolio.
-  get ":category_slug", to: "categories#show", as: :category
-  get ":category_slug/:entry_slug", to: "entries#show", as: :entry
+  # Catálogo file-based (content/*.json vía AlgovizCatalog).
+  get "c/:slug", to: "categories#show", as: :category
+  get "a/:slug", to: "entries#show",    as: :entry
+  get "p/:slug", to: "patterns#show",   as: :pattern
 end

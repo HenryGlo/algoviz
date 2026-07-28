@@ -1,9 +1,10 @@
 class CategoriesController < ApplicationController
   def show
-    @category = Category.find_by!(slug: params[:category_slug])
-    @subtype = params[:subtype].presence
-    @entries = @category.entries.with_subtype(@subtype).ordered
-    # El template completo se re-renderiza; Turbo extrae sólo el frame "catalog"
-    # cuando el request viene de un chip de filtro. Sin recarga de página.
+    @slug = params[:slug]
+    @category = AlgovizCatalog.category(@slug) or return head(:not_found)
+    @entries  = AlgovizCatalog.entries_in(@slug)
+    @patterns = AlgovizCatalog.patterns_in(@slug)
+    @subtypes = AlgovizCatalog.subtypes(@slug)
+    @soon     = AlgovizCatalog::SOON.fetch(@slug, [])
   end
 end

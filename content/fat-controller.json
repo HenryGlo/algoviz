@@ -1,0 +1,21 @@
+{
+  "id": "fat-controller",
+  "category": "rails-antipatterns",
+  "kind": "antipattern",
+  "title": "Fat controller",
+  "tagline": "The controller ends up knowing about Stripe, email, inventory, and your birthday.",
+  "history": "A classic Rails smell: the framework makes controller code so easy to write that business logic quietly piles up there.",
+  "useCases": [
+    "Actions longer than ~10 lines",
+    "The controller talks to payment / mail / external services directly",
+    "Logic you can't test without a full request",
+    "The same flow copy-pasted across actions"
+  ],
+  "whenToUse": "Extract a service object (a PORO) named after the business verb — PlaceOrder, not OrderService. Now it's testable without a request.",
+  "whenNotToUse": "A three-line action doesn't need a service. Rails is fine, actually.",
+  "complexity": "Refactor target: move the story into an object with a single call.",
+  "codeContrast": {
+    "bad": "class OrdersController < ApplicationController\n  def create\n    @order = Order.new(order_params)\n    @order.total  = @order.items.sum(&:price)\n    @order.total -= Coupon.find_by(code: params[:coupon])&.amount.to_i\n    Stripe::Charge.create(amount: @order.total, source: params[:token])\n    OrderMailer.confirmation(@order).deliver_later\n    Inventory.reserve(@order.items)\n    @order.save!\n    redirect_to @order\n  end\nend",
+    "good": "# app/controllers/orders_controller.rb\nclass OrdersController < ApplicationController\n  def create\n    result = PlaceOrder.call(order_params,\n                             coupon: params[:coupon],\n                             token:  params[:token])\n    redirect_to result.order\n  end\nend\n\n# app/services/place_order.rb — named after the business verb\nclass PlaceOrder\n  def self.call(...) = new(...).call\n\n  def initialize(attrs, coupon:, token:)\n    @attrs, @coupon, @token = attrs, coupon, token\n  end\n\n  def call\n    # Stripe, mailer, inventory, totals — all here, all\n    # testable without a request. Returns a small result object.\n  end\nend"
+  }
+}

@@ -1,25 +1,47 @@
-<section class="hero">
-  <p class="hero__eyebrow">portfolio · Rails 8 + Hotwire</p>
-  <h1 class="hero__title">Algoritmos que se <span class="grad">animan solos</span>.</h1>
-  <p class="hero__lead">
-    Cada algoritmo de ML y cada patrón de software, explicado paso a paso — con la
-    implementación en <strong>Python</strong> y <strong>Ruby</strong> al lado.
-    El algoritmo corre en el server y emite un <em>trace</em>; un Player de Stimulus lo reproduce.
-  </p>
-</section>
-
-<section class="section">
-  <h2 class="section__title">Categorías</h2>
-  <div class="grid grid--cards">
-    <%= render partial: "categories/category_card", collection: @categories, as: :category %>
-  </div>
-</section>
-
-<% if @featured.any? %>
-  <section class="section">
-    <h2 class="section__title">Destacados</h2>
-    <div class="grid grid--entries">
-      <%= render partial: "entries/entry_card", collection: @featured, as: :entry %>
+<div class="wrap">
+  <section class="hero-sec">
+    <div>
+      <div class="eyebrow" style="display:inline-flex;align-items:center;gap:9px;margin-bottom:24px">
+        <span class="dot"></span> open source · rails 8 + hotwire · 0 node_modules</div>
+      <h1 class="hero">Algoritmos que<br><span class="grad">se animan solos.</span></h1>
+      <p style="max-width:520px;font-size:18px;color:var(--muted);margin-bottom:30px">El algoritmo corre de verdad, en Ruby, en el server. Emite un <b>trace</b> — un array de pasos — y el navegador lo reproduce como un video scrubbeable. Sin animaciones dibujadas a mano, sin diagramas que mienten.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <%= link_to "Explorar el catálogo", category_path("machine-learning"), class: "btn btn-primary" %>
+        <%= link_to "Ver la recta ajustarse", entry_path("linear-regression"), class: "btn btn-ghost" %>
+      </div>
+      <div style="display:flex;gap:26px;margin-top:32px" class="mono">
+        <span style="color:var(--faint);font-size:11.5px"><%= @hero_points.size %> puntos</span>
+        <span style="color:var(--faint);font-size:11.5px"><%= @hero_trace.size %> pasos emitidos</span>
+        <span style="color:var(--faint);font-size:11.5px">1 svg, sin canvas</span>
+      </div>
     </div>
+    <figure>
+      <div class="fig-head"><span>regresión lineal · en vivo</span>
+        <%= link_to "abrir ↗", entry_path("linear-regression"), style: "color:var(--coral2)" %></div>
+      <div style="padding:14px" data-controller="hero"
+           data-hero-trace-value="<%= @hero_trace.to_json %>"
+           data-hero-points-value="<%= @hero_points.to_json %>">
+        <svg class="plot" data-hero-target="canvas"></svg>
+      </div>
+    </figure>
   </section>
-<% end %>
+
+  <h2 class="sec">Cómo funciona</h2>
+  <div class="steps">
+    <div class="step"><div class="n">01 · TRACE</div><h3>El algoritmo confiesa</h3><p>Ruby real corre en el server y llama a <b>trace.emit</b> en cada momento importante. Sale un array plano de pasos.</p></div>
+    <div class="step"><div class="n">02 · PLAYER</div><h3>Un VCR de Stimulus</h3><p>Play, pausa, paso, scrub, bajá a 0.5×. El player maneja el tiempo; no sabe nada de clustering.</p></div>
+    <div class="step"><div class="n">03 · RENDERER</div><h3>Un paso, un frame</h3><p>Un módulo JS chico convierte un paso en SVG. Cambiá el renderer, mantené el trace — mismo algoritmo, otra metáfora.</p></div>
+  </div>
+
+  <h2 class="sec">Categorías</h2>
+  <div class="cats">
+    <% @categories.each do |slug, c| %>
+      <%= link_to category_path(slug), class: "cat", style: "border-color:#{c[:color]}33" do %>
+        <span class="tag" style="color:<%= c[:color] %>;background:<%= c[:color] %>1a"><%= c[:name] %></span>
+        <h3><%= c[:name] %></h3><p><%= c[:desc] %></p>
+        <div class="meta"><%= c[:count] %></div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+<div class="wrap"><footer><span>algoviz v0.4 — built by Henry</span><span>trace → player → renderer</span></footer></div>
