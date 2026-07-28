@@ -1,0 +1,31 @@
+# Blueprint de Render para algoviz (Rails 8 + SQLite, deploy con Docker).
+# Conectá el repo en Render → "New +" → "Blueprint" y apuntá a este archivo.
+services:
+  - type: web
+    name: algoviz
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /up
+    autoDeploy: true
+    # El free tier no ofrece disco persistente: el filesystem se regenera en
+    # cada deploy. No pasa nada — el contenido es de sólo lectura y se
+    # reconstruye desde db/seeds.rb (idempotente) en el arranque.
+    #
+    # Para persistir la SQLite entre deploys, subí a un plan pago y agregá:
+    #   disk:
+    #     name: algoviz-storage
+    #     mountPath: /rails/storage
+    #     sizeGB: 1
+    dockerCommand: >-
+      sh -c "./bin/rails db:prepare && ./bin/rails db:seed &&
+      ./bin/rails server -b 0.0.0.0 -p ${PORT:-3000}"
+    envVars:
+      # Cargá el valor a mano en el dashboard (es el contenido de
+      # config/master.key, que NO se commitea).
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
+      - key: WEB_CONCURRENCY
+        value: "2"

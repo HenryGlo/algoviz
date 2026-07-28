@@ -1,0 +1,38 @@
+<% content_for :title, "#{@category.name} · algoviz" %>
+
+<nav class="breadcrumb">
+  <%= link_to "algoviz", root_path %> <span>/</span> <span aria-current="page"><%= @category.name %></span>
+</nav>
+
+<header class="page-head" style="--accent: <%= @category.color %>">
+  <span class="page-head__dot"></span>
+  <div>
+    <h1 class="page-head__title"><%= @category.name %></h1>
+    <p class="page-head__lead"><%= @category.description %></p>
+  </div>
+</header>
+
+<%# El filtro por subtipo vive dentro de un Turbo Frame: al tocar un chip,
+    Turbo re-renderiza server-side sólo este frame, sin recargar la página. %>
+<%= turbo_frame_tag "catalog" do %>
+  <% if @category.subtypes.any? %>
+    <div class="chips">
+      <%= link_to "Todos", category_path(@category),
+            class: "chip #{'chip--on' if @subtype.blank?}",
+            data: { turbo_action: "advance" } %>
+      <% @category.subtypes.each do |sub| %>
+        <%= link_to sub, category_path(@category, subtype: sub),
+              class: "chip #{'chip--on' if @subtype == sub}",
+              data: { turbo_action: "advance" } %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @entries.any? %>
+    <div class="grid grid--entries">
+      <%= render partial: "entries/entry_card", collection: @entries, as: :entry %>
+    </div>
+  <% else %>
+    <p class="empty">Todavía no hay entradas para este filtro.</p>
+  <% end %>
+<% end %>

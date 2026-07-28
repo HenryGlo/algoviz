@@ -1,0 +1,12 @@
+<%= link_to entry_path(entry.category, entry), class: "card card--entry", style: "--accent: #{entry.category.color}" do %>
+  <div class="card__head">
+    <span class="tag"><%= entry.category.name %></span>
+    <%= level_badge(entry.level) %>
+  </div>
+  <h3 class="card__title"><%= entry.title %></h3>
+  <p class="card__desc"><%= entry.intuition %></p>
+  <span class="card__meta">
+    <%= entry.animated? ? "▶ animado" : "↔ antes/después" %>
+    <% if entry.subtype.present? %> · <%= entry.subtype %><% end %>
+  </span>
+<% end %>

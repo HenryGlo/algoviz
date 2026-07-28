@@ -1,0 +1,25 @@
+<section class="hero">
+  <p class="hero__eyebrow">portfolio · Rails 8 + Hotwire</p>
+  <h1 class="hero__title">Algoritmos que se <span class="grad">animan solos</span>.</h1>
+  <p class="hero__lead">
+    Cada algoritmo de ML y cada patrón de software, explicado paso a paso — con la
+    implementación en <strong>Python</strong> y <strong>Ruby</strong> al lado.
+    El algoritmo corre en el server y emite un <em>trace</em>; un Player de Stimulus lo reproduce.
+  </p>
+</section>
+
+<section class="section">
+  <h2 class="section__title">Categorías</h2>
+  <div class="grid grid--cards">
+    <%= render partial: "categories/category_card", collection: @categories, as: :category %>
+  </div>
+</section>
+
+<% if @featured.any? %>
+  <section class="section">
+    <h2 class="section__title">Destacados</h2>
+    <div class="grid grid--entries">
+      <%= render partial: "entries/entry_card", collection: @featured, as: :entry %>
+    </div>
+  </section>
+<% end %>

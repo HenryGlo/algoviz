@@ -1,0 +1,19 @@
+<% content_for :title, "#{@entry.title} · algoviz" %>
+
+<nav class="breadcrumb">
+  <%= link_to "algoviz", root_path %> <span>/</span>
+  <%= link_to @category.name, category_path(@category) %> <span>/</span>
+  <span aria-current="page"><%= @entry.title %></span>
+</nav>
+
+<header class="entry-head" style="--accent: <%= @category.color %>">
+  <div class="entry-head__tags">
+    <span class="tag"><%= @category.name %></span>
+    <% if @entry.subtype.present? %><span class="tag tag--ghost"><%= @entry.subtype %></span><% end %>
+    <%= level_badge(@entry.level) %>
+  </div>
+  <h1 class="entry-head__title"><%= @entry.title %></h1>
+  <p class="entry-head__intuition"><%= @entry.intuition %></p>
+</header>
+
+<%= render @entry.animated? ? "entries/animated" : "entries/code_contrast" %>

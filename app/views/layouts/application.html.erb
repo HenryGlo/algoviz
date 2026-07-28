@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <title><%= content_for(:title) || "algoviz — algoritmos animados" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Algoritmos de ML y patrones de software explicados paso a paso, con la implementación en Python y Ruby al lado.">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "rouge", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="wrap site-header__inner">
+        <%= link_to root_path, class: "brand" do %>
+          <span class="brand__mark">◐</span> algoviz
+        <% end %>
+        <nav class="site-nav">
+          <% Category.order(:name).each do |c| %>
+            <%= link_to c.name, category_path(c), class: "site-nav__link", style: "--accent: #{c.color}" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap site-main">
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>algoviz · Rails 8 + Hotwire · el algoritmo emite un <em>trace</em>, el Player lo reproduce.</p>
+      </div>
+    </footer>
+  </body>
+</html>

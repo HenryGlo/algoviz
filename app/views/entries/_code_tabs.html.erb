@@ -1,0 +1,24 @@
+<% snippets = entry.code_snippets.slice("python", "ruby").reject { |_, v| v.blank? } %>
+<% if snippets.any? %>
+  <section class="code" data-controller="tabs">
+    <div class="code__tabs" role="tablist">
+      <% snippets.keys.each_with_index do |lang, i| %>
+        <button class="code__tab <%= 'code__tab--on' if i.zero? %>"
+                role="tab"
+                data-tabs-target="tab"
+                data-action="tabs#select"
+                data-lang="<%= lang %>">
+          <%= lang == "python" ? "Python" : "Ruby" %>
+        </button>
+      <% end %>
+    </div>
+    <% snippets.each_with_index do |(lang, code), i| %>
+      <div class="code__panel <%= 'code__panel--on' if i.zero? %>"
+           role="tabpanel"
+           data-tabs-target="panel"
+           data-lang="<%= lang %>">
+        <%= highlight_code(code, lang) %>
+      </div>
+    <% end %>
+  </section>
+<% end %>
