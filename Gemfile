@@ -57,5 +57,5 @@ group :development do
 end
 
 
-gem "rouge", "~> 5.0"
+gem "rouge", "~> 5.1"
 gem "commonmarker", "~> 2.9"
