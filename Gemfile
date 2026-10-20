@@ -58,4 +58,4 @@ end
 
 
 gem "rouge", "~> 5.0"
-gem "commonmarker", "~> 2.9"
+gem "commonmarker", "~> 2.10"
